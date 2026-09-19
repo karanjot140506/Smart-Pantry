@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="./screenshots/banner.svg" alt="Smart Pantry banner" width="100%" />
-
 # 🥑 Smart Pantry
 ### Grocery & Expiry Management System
 
