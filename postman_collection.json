@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "Smart Pantry API",
+    "description": "Grocery & Expiry Management System \u2014 full REST API collection. Run 'Register' or 'Login' first; the JWT token is captured automatically into the {{token}} collection variable and reused by every other request.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "pantryItemId",
+      "value": ""
+    },
+    {
+      "key": "shoppingItemId",
+      "value": ""
+    },
+    {
+      "key": "recipeId",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login (Demo Account)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@smartpantry.com\",\n  \"password\": \"Demo@1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pantry",
+      "item": [
+        {
+          "name": "List Pantry Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pantry"
+          }
+        },
+        {
+          "name": "Add Pantry Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pantry",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Whole Milk\",\n  \"category\": \"Dairy\",\n  \"quantity\": 2,\n  \"unit\": \"l\",\n  \"lowStockThreshold\": 1,\n  \"expiryDate\": \"2026-08-05\",\n  \"price\": 3.5,\n  \"storageLocation\": \"Fridge\",\n  \"notes\": \"Organic\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('pantryItemId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Pantry Item by Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pantry/{{pantryItemId}}"
+          }
+        },
+        {
+          "name": "Update Pantry Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pantry/{{pantryItemId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Whole Milk\",\n  \"category\": \"Dairy\",\n  \"quantity\": 1,\n  \"unit\": \"l\",\n  \"lowStockThreshold\": 1,\n  \"expiryDate\": \"2026-08-05\",\n  \"price\": 3.5,\n  \"storageLocation\": \"Fridge\",\n  \"notes\": \"Half used\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Expiring Items (7 days)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pantry/expiring?days=7"
+          }
+        },
+        {
+          "name": "Get Low Stock Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/pantry/low-stock"
+          }
+        },
+        {
+          "name": "Delete Pantry Item",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/pantry/{{pantryItemId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shopping List",
+      "item": [
+        {
+          "name": "List Shopping Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/shopping-list"
+          }
+        },
+        {
+          "name": "Add Shopping Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/shopping-list",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Greek Yogurt\",\n  \"category\": \"Dairy\",\n  \"quantity\": 2,\n  \"unit\": \"pcs\",\n  \"estimatedPrice\": 4.25,\n  \"priority\": \"HIGH\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('shoppingItemId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Shopping Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/shopping-list/{{shoppingItemId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Greek Yogurt\",\n  \"category\": \"Dairy\",\n  \"quantity\": 3,\n  \"unit\": \"pcs\",\n  \"estimatedPrice\": 4.25,\n  \"priority\": \"MEDIUM\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Toggle Purchased (restocks pantry)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/shopping-list/{{shoppingItemId}}/toggle"
+          }
+        },
+        {
+          "name": "Delete Shopping Item",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/shopping-list/{{shoppingItemId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipes",
+      "item": [
+        {
+          "name": "List All Recipes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recipes"
+          }
+        },
+        {
+          "name": "Get Recipe by Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recipes/{{recipeId}}"
+          }
+        },
+        {
+          "name": "Add Custom Recipe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/recipes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Avocado Toast\",\n  \"description\": \"Simple, fast breakfast.\",\n  \"ingredients\": [\"Bread\", \"Avocado\", \"Salt\", \"Lemon\"],\n  \"steps\": [\"Toast bread\", \"Mash avocado with salt and lemon\", \"Spread on toast\"],\n  \"prepTimeMinutes\": 8,\n  \"difficulty\": \"EASY\",\n  \"cuisine\": \"General\",\n  \"imageEmoji\": \"\ud83e\udd51\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('recipeId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recipe Suggestions (from pantry)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/recipes/suggestions"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/analytics/dashboard"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: smart-pantry
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/smartpantry}
+  jackson:
+    default-property-inclusion: non_null
+  web:
+    resources:
+      add-mappings: true
+
+# SPA fallback so React Router deep links (e.g. /pantry) work on refresh
+spring.mvc.static-path-pattern: /**
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:c21hcnQtcGFudHJ5LXN1cGVyLXNlY3JldC1rZXktY2hhbmdlLW1lLWluLXByb2R1Y3Rpb24tMjAyNg==}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:8080}
+  low-stock-threshold: 2
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.smartpantry: INFO
